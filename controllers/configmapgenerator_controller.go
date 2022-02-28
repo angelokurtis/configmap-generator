@@ -19,39 +19,44 @@ package controllers
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/runtime"
+	"github.com/angelokurtis/reconciler"
+	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	kurtisdevbrv1beta1 "github.com/angelokurtis/configmap-generator/api/v1beta1"
+	"github.com/angelokurtis/configmap-generator/pkg/generator"
 )
 
 // ConfigMapGeneratorReconciler reconciles a ConfigMapGenerator object
 type ConfigMapGeneratorReconciler struct {
+	reconciler.Result
 	client.Client
-	Scheme *runtime.Scheme
 }
 
+//+kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=kurtis.dev.br,resources=configmapgenerators,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=kurtis.dev.br,resources=configmapgenerators/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=kurtis.dev.br,resources=configmapgenerators/finalizers,verbs=update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the ConfigMapGenerator object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *ConfigMapGeneratorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	gen := &kurtisdevbrv1beta1.ConfigMapGenerator{}
+	err := r.Get(ctx, req.NamespacedName, gen)
+	if errors.IsNotFound(err) {
+		return r.Finish(ctx) // Ignoring since object must be deleted
+	}
+	if err != nil {
+		return r.RequeueOnErr(ctx, err) // Failed to get ConfigMapGenerator
+	}
 
-	return ctrl.Result{}, nil
+	return reconciler.Chain(
+		&generator.ConfigmapCreation{},
+	).Reconcile(ctx, gen)
 }
 
 // SetupWithManager sets up the controller with the Manager.

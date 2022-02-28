@@ -1,0 +1,95 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.8.0
+  creationTimestamp: null
+  name: configmapgenerators.kurtis.dev.br
+spec:
+  group: kurtis.dev.br
+  names:
+    kind: ConfigMapGenerator
+    listKind: ConfigMapGeneratorList
+    plural: configmapgenerators
+    singular: configmapgenerator
+  scope: Namespaced
+  versions:
+  - name: v1beta1
+    schema:
+      openAPIV3Schema:
+        description: ConfigMapGenerator is the Schema for the configmapgenerators
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ConfigMapGeneratorSpec defines the desired state of ConfigMapGenerator
+            properties:
+              annotations:
+                additionalProperties:
+                  type: string
+                type: object
+              files:
+                items:
+                  type: string
+                type: array
+              labels:
+                additionalProperties:
+                  type: string
+                type: object
+              literals:
+                items:
+                  type: string
+                type: array
+              sourceRef:
+                description: Reference of the source where the kustomization file
+                  is.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  kind:
+                    description: Kind of the referent.
+                    enum:
+                    - GitRepository
+                    - Bucket
+                    type: string
+                  name:
+                    description: Name of the referent.
+                    type: string
+                  namespace:
+                    description: Namespace of the referent, defaults to the namespace
+                      of the Kubernetes resource object that contains the reference.
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+            required:
+            - sourceRef
+            type: object
+          status:
+            description: ConfigMapGeneratorStatus defines the observed state of ConfigMapGenerator
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

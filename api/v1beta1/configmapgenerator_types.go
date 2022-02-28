@@ -17,6 +17,7 @@ limitations under the License.
 package v1beta1
 
 import (
+	kustomizev1 "github.com/fluxcd/kustomize-controller/api/v1beta2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -29,6 +30,10 @@ type ConfigMapGeneratorSpec struct {
 	Literals    []string          `json:"literals,omitempty"`
 	Annotations map[string]string `json:"annotations,omitempty"`
 	Labels      map[string]string `json:"labels,omitempty"`
+
+	// Reference of the source where the kustomization file is.
+	// +required
+	SourceRef kustomizev1.CrossNamespaceSourceReference `json:"sourceRef"`
 }
 
 // ConfigMapGeneratorStatus defines the observed state of ConfigMapGenerator
