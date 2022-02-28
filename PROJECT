@@ -1,0 +1,6 @@
+domain: kurtis.dev.br
+layout:
+- go.kubebuilder.io/v3
+projectName: configmap-generator
+repo: github.com/angelokurtis/configmap-generator
+version: "3"
