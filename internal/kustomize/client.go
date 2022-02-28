@@ -16,10 +16,15 @@ import (
 type Client struct {
 	fs         filesys.FileSystem
 	kustomizer *krusty.Kustomizer
+	manifest   Manifest
 }
 
-func NewClient(fs filesys.FileSystem, kustomizer *krusty.Kustomizer) *Client {
-	return &Client{fs: fs, kustomizer: kustomizer}
+func NewClient(fs filesys.FileSystem, kustomizer *krusty.Kustomizer, manifest Manifest) *Client {
+	return &Client{fs: fs, kustomizer: kustomizer, manifest: manifest}
+}
+
+type Manifest interface {
+	FromBytes(ctx context.Context, manifests []byte) (mf.Manifest, error)
 }
 
 func (c *Client) GenerateConfigMap(ctx context.Context, source string, generator *ConfigMapGenerator) (mf.Manifest, error) {
@@ -32,8 +37,8 @@ func (c *Client) GenerateConfigMap(ctx context.Context, source string, generator
 	if err != nil {
 		return mf.Manifest{}, err
 	}
-	_ = content
-	return mf.Manifest{}, nil
+
+	return c.manifest.FromBytes(ctx, content)
 }
 
 func (c *Client) generateConfigMap(ctx context.Context, dir string, generator *ConfigMapGenerator) ([]byte, error) {
