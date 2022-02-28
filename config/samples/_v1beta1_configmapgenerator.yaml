@@ -1,0 +1,6 @@
+apiVersion: kurtis.dev.br/v1beta1
+kind: ConfigMapGenerator
+metadata:
+  name: configmapgenerator-sample
+spec:
+  # TODO(user): Add fields here

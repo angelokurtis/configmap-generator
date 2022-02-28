@@ -1,0 +1,20 @@
+# permissions for end users to view configmapgenerators.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: configmapgenerator-viewer-role
+rules:
+- apiGroups:
+  - kurtis.dev.br
+  resources:
+  - configmapgenerators
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kurtis.dev.br
+  resources:
+  - configmapgenerators/status
+  verbs:
+  - get

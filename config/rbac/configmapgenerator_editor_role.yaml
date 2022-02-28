@@ -1,0 +1,24 @@
+# permissions for end users to edit configmapgenerators.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: configmapgenerator-editor-role
+rules:
+- apiGroups:
+  - kurtis.dev.br
+  resources:
+  - configmapgenerators
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kurtis.dev.br
+  resources:
+  - configmapgenerators/status
+  verbs:
+  - get
