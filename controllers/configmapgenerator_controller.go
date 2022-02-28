@@ -66,8 +66,8 @@ func (r *ConfigMapGeneratorReconciler) Reconcile(ctx context.Context, req ctrl.R
 	}
 
 	return reconciler.Chain(
-		r.handler.ConfigmapCreation,
 		r.handler.SourceFromGitRepository,
+		r.handler.ConfigmapCreation,
 	).Reconcile(ctx, gen)
 }
 

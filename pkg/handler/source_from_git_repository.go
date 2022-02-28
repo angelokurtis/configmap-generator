@@ -74,5 +74,5 @@ func (s *SourceFromGitRepository) reconcile(ctx context.Context, gen *v1beta1.Co
 		log.Info("Source is already available locally", "path", dest, "checksum", artifact.Checksum)
 	}
 
-	return s.Next(ctx, gen)
+	return s.Next(contextWithSource(ctx, dest), gen)
 }
