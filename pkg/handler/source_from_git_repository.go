@@ -8,7 +8,6 @@ import (
 	"github.com/angelokurtis/reconciler"
 	sourcev1beta1 "github.com/fluxcd/source-controller/api/v1beta1"
 	"github.com/go-logr/logr"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -44,8 +43,7 @@ func (s *SourceFromGitRepository) Reconcile(ctx context.Context, obj client.Obje
 func (s *SourceFromGitRepository) reconcile(ctx context.Context, gen *v1beta1.ConfigMapGenerator) (ctrl.Result, error) {
 	log := logr.FromContextOrDiscard(ctx)
 
-	key := types.NamespacedName{Namespace: gen.GetNamespace(), Name: gen.GetName()}
-	repo, err := s.reader.FetchGitRepository(ctx, key)
+	repo, err := s.reader.FetchGitRepository(ctx, gen.GetSourceRefNamespacedName())
 	if err != nil {
 		return s.RequeueOnErr(ctx, err)
 	}
