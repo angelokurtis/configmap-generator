@@ -26,13 +26,24 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	kurtisdevbrv1beta1 "github.com/angelokurtis/configmap-generator/api/v1beta1"
-	"github.com/angelokurtis/configmap-generator/pkg/generator"
+	"github.com/angelokurtis/configmap-generator/pkg/handler"
 )
 
 // ConfigMapGeneratorReconciler reconciles a ConfigMapGenerator object
 type ConfigMapGeneratorReconciler struct {
 	reconciler.Result
-	client.Client
+	client  client.Client
+	handler ConfigMapGeneratorHandler
+}
+
+func NewConfigMapGeneratorReconciler(client client.Client, handler ConfigMapGeneratorHandler) *ConfigMapGeneratorReconciler {
+	return &ConfigMapGeneratorReconciler{client: client, handler: handler}
+}
+
+// ConfigMapGeneratorHandler aggregates the handlers of ConfigMapGenerator
+type ConfigMapGeneratorHandler struct {
+	SourceFromGitRepository *handler.SourceFromGitRepository
+	ConfigmapCreation       *handler.ConfigMapCreation
 }
 
 //+kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
@@ -46,7 +57,7 @@ func (r *ConfigMapGeneratorReconciler) Reconcile(ctx context.Context, req ctrl.R
 	_ = log.FromContext(ctx)
 
 	gen := &kurtisdevbrv1beta1.ConfigMapGenerator{}
-	err := r.Get(ctx, req.NamespacedName, gen)
+	err := r.client.Get(ctx, req.NamespacedName, gen)
 	if errors.IsNotFound(err) {
 		return r.Finish(ctx) // Ignoring since object must be deleted
 	}
@@ -55,7 +66,8 @@ func (r *ConfigMapGeneratorReconciler) Reconcile(ctx context.Context, req ctrl.R
 	}
 
 	return reconciler.Chain(
-		&generator.ConfigmapCreation{},
+		r.handler.ConfigmapCreation,
+		r.handler.SourceFromGitRepository,
 	).Reconcile(ctx, gen)
 }
 

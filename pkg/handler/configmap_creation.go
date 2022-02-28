@@ -1,4 +1,4 @@
-package generator
+package handler
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-type ConfigmapCreation struct{ reconciler.Funcs }
+type ConfigMapCreation struct{ reconciler.Funcs }
 
-func (c *ConfigmapCreation) Reconcile(ctx context.Context, obj client.Object) (ctrl.Result, error) {
+func (c *ConfigMapCreation) Reconcile(ctx context.Context, obj client.Object) (ctrl.Result, error) {
 	return c.Next(ctx, obj)
 }
