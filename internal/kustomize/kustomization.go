@@ -8,7 +8,9 @@ type Kustomization struct {
 }
 
 type GeneratorOptions struct {
-	DisableNameSuffixHash bool `yaml:"disableNameSuffixHash,omitempty"`
+	DisableNameSuffixHash bool              `yaml:"disableNameSuffixHash,omitempty"`
+	Labels                map[string]string `json:"labels,omitempty"`
+	Annotations           map[string]string `json:"annotations,omitempty"`
 }
 
 type ConfigMapGenerator struct {
@@ -17,11 +19,6 @@ type ConfigMapGenerator struct {
 	Literals []string `yaml:"literals,omitempty"`
 }
 
-func (c *ConfigMapGenerator) Marshal() ([]byte, error) {
-	generators := []*ConfigMapGenerator{c}
-	k := &Kustomization{
-		GeneratorOptions:   &GeneratorOptions{DisableNameSuffixHash: true},
-		ConfigMapGenerator: generators,
-	}
+func (k *Kustomization) Marshal() ([]byte, error) {
 	return yaml.Marshal(k)
 }

@@ -8,9 +8,10 @@ import (
 
 	"github.com/hashicorp/go-getter"
 
-	mf "github.com/manifestival/manifestival"
 	"sigs.k8s.io/kustomize/api/krusty"
 	"sigs.k8s.io/kustomize/kyaml/filesys"
+
+	"github.com/angelokurtis/configmap-generator/internal/manifest"
 )
 
 type Client struct {
@@ -24,25 +25,25 @@ func NewClient(fs filesys.FileSystem, kustomizer *krusty.Kustomizer, manifest Ma
 }
 
 type Manifest interface {
-	FromBytes(ctx context.Context, manifests []byte) (mf.Manifest, error)
+	FromBytes(data []byte) (manifest.List, error)
 }
 
-func (c *Client) GenerateConfigMap(ctx context.Context, source string, generator *ConfigMapGenerator) (mf.Manifest, error) {
-	destination := source[0 : len(source)-len(".tar.gz")]
-	defer os.RemoveAll(destination)
-	if err := getter.GetAny(destination, source); err != nil {
-		return mf.Manifest{}, fmt.Errorf("error extracting Source artifact %s: %w", source, err)
+func (c *Client) Build(ctx context.Context, source string, kustomization *Kustomization) (manifest.List, error) {
+	dest := source[0 : len(source)-len(".tar.gz")]
+	defer os.RemoveAll(dest)
+	if err := getter.GetAny(dest, source); err != nil {
+		return nil, fmt.Errorf("error extracting Source artifact %s: %w", source, err)
 	}
-	content, err := c.generateConfigMap(ctx, destination, generator)
+	content, err := c.build(ctx, dest, kustomization)
 	if err != nil {
-		return mf.Manifest{}, err
+		return nil, err
 	}
 
-	return c.manifest.FromBytes(ctx, content)
+	return c.manifest.FromBytes(content)
 }
 
-func (c *Client) generateConfigMap(ctx context.Context, dir string, generator *ConfigMapGenerator) ([]byte, error) {
-	content, err := generator.Marshal()
+func (c *Client) build(ctx context.Context, dir string, kustomization *Kustomization) ([]byte, error) {
+	content, err := kustomization.Marshal()
 	if err != nil {
 		return nil, err
 	}
