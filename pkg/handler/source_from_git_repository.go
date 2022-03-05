@@ -40,23 +40,23 @@ func (s *SourceFromGitRepository) Reconcile(ctx context.Context, obj client.Obje
 	return s.reconcile(ctx, gen)
 }
 
-func (s *SourceFromGitRepository) reconcile(ctx context.Context, gen *v1beta1.ConfigMapGenerator) (ctrl.Result, error) {
+func (s *SourceFromGitRepository) reconcile(ctx context.Context, resource *v1beta1.ConfigMapGenerator) (ctrl.Result, error) {
 	log := logr.FromContextOrDiscard(ctx)
 
-	repo, err := s.reader.FetchGitRepository(ctx, gen.GetSourceRefNamespacedName())
+	repo, err := s.reader.FetchGitRepository(ctx, resource.GetSourceRefNamespacedName())
 	if err != nil {
 		return s.RequeueOnErr(ctx, err)
 	}
 
 	if repo == nil {
 		log.Info("GitRepository was not found")
-		return s.Next(ctx, gen)
+		return s.Next(ctx, resource)
 	}
 
 	artifact := repo.GetArtifact()
 	if artifact == nil {
 		log.Info("GitRepository is not ready")
-		return s.Next(ctx, gen)
+		return s.Next(ctx, resource)
 	}
 
 	u, err := url.Parse(artifact.URL)
@@ -74,5 +74,5 @@ func (s *SourceFromGitRepository) reconcile(ctx context.Context, gen *v1beta1.Co
 		log.Info("Source is already available locally", "path", dest, "checksum", artifact.Checksum)
 	}
 
-	return s.Next(contextWithSource(ctx, dest), gen)
+	return s.Next(contextWithSource(ctx, dest), resource)
 }
