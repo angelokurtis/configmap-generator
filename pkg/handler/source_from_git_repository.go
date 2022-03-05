@@ -33,11 +33,11 @@ type ArtifactDownloader interface {
 }
 
 func (s *SourceFromGitRepository) Reconcile(ctx context.Context, obj client.Object) (ctrl.Result, error) {
-	gen, ok := obj.(*v1beta1.ConfigMapGenerator)
-	if !ok || gen.Spec.SourceRef.Kind != "GitRepository" {
+	resource, ok := obj.(*v1beta1.ConfigMapGenerator)
+	if !ok || resource.Spec.SourceRef.Kind != "GitRepository" {
 		return s.Next(ctx, obj)
 	}
-	return s.reconcile(ctx, gen)
+	return s.reconcile(ctx, resource)
 }
 
 func (s *SourceFromGitRepository) reconcile(ctx context.Context, resource *v1beta1.ConfigMapGenerator) (ctrl.Result, error) {

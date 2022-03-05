@@ -58,8 +58,8 @@ type ConfigMapGeneratorHandler struct {
 func (r *ConfigMapGeneratorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
-	gen := &kurtisdevbrv1beta1.ConfigMapGenerator{}
-	err := r.client.Get(ctx, req.NamespacedName, gen)
+	resource := &kurtisdevbrv1beta1.ConfigMapGenerator{}
+	err := r.client.Get(ctx, req.NamespacedName, resource)
 	if errors.IsNotFound(err) {
 		return r.Finish(ctx) // Ignoring since object must be deleted
 	}
@@ -70,7 +70,7 @@ func (r *ConfigMapGeneratorReconciler) Reconcile(ctx context.Context, req ctrl.R
 	return reconciler.Chain(
 		r.handler.SourceFromGitRepository,
 		r.handler.ConfigmapCreation,
-	).Reconcile(ctx, gen)
+	).Reconcile(ctx, resource)
 }
 
 // SetupWithManager sets up the controller with the Manager.

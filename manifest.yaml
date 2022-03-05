@@ -1,0 +1,17 @@
+apiVersion: kurtis.dev.br/v1beta1
+kind: ConfigMapGenerator
+metadata:
+  name: istio-services-grafana-dashboards
+  namespace: configmap-generator-system
+spec:
+  labels:
+    owner: tiago
+  files:
+  - manifests/addons/dashboards/istio-workload-dashboard.json
+  - manifests/addons/dashboards/istio-service-dashboard.json
+  - manifests/addons/dashboards/istio-mesh-dashboard.json
+  - manifests/addons/dashboards/istio-extension-dashboard.json
+  sourceRef:
+    kind: GitRepository
+    name: istio
+    namespace: fluxcd

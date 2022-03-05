@@ -28,15 +28,15 @@ type Kustomize interface {
 }
 
 func (c *ConfigMapCreation) Reconcile(ctx context.Context, obj client.Object) (ctrl.Result, error) {
-	gen, ok := obj.(*v1beta1.ConfigMapGenerator)
+	resource, ok := obj.(*v1beta1.ConfigMapGenerator)
 	if !ok {
 		return c.Next(ctx, obj)
 	}
 	source := sourceFromContext(ctx)
 	if source == "" {
-		return c.Next(ctx, gen)
+		return c.Next(ctx, resource)
 	}
-	return c.reconcile(ctx, source, gen)
+	return c.reconcile(ctx, source, resource)
 }
 
 func (c *ConfigMapCreation) reconcile(ctx context.Context, source string, resource *v1beta1.ConfigMapGenerator) (ctrl.Result, error) {
