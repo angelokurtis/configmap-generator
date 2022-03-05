@@ -20,6 +20,7 @@ import (
 	"context"
 
 	"github.com/angelokurtis/reconciler"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -48,8 +49,9 @@ type ConfigMapGeneratorHandler struct {
 
 //+kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=kurtis.dev.br,resources=configmapgenerators,verbs=get;list;watch;create;update;patch;delete
-//+kubebuilder:rbac:groups=kurtis.dev.br,resources=configmapgenerators/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=kurtis.dev.br,resources=configmapgenerators/finalizers,verbs=update
+//+kubebuilder:rbac:groups=kurtis.dev.br,resources=configmapgenerators/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=source.toolkit.fluxcd.io,resources=gitrepositories,verbs=get;list;watch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -75,5 +77,7 @@ func (r *ConfigMapGeneratorReconciler) Reconcile(ctx context.Context, req ctrl.R
 func (r *ConfigMapGeneratorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&kurtisdevbrv1beta1.ConfigMapGenerator{}).
+		Owns(&corev1.ConfigMap{}).
+		// Watches(&source.Kind{Type: &v1beta1.GitRepository{}}, &EnqueueRequestForGitRepositoryRef{}). // TODO: watches for GitRepository changes
 		Complete(r)
 }
