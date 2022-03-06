@@ -1,6 +1,9 @@
-
+# The project version for the bundle
+VERSION ?= 0.0.1
+# The docker.io namespace and part of the image name for remote images
+IMAGE_TAG_BASE ?= kurtis/configmap-generator
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.23
 
