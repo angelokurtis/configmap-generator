@@ -1,12 +1,19 @@
 package v1beta1
 
-import "k8s.io/apimachinery/pkg/types"
+import (
+	"github.com/fluxcd/kustomize-controller/api/v1beta2"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+)
 
-func (in *ConfigMapGenerator) GetSourceRefNamespacedName() types.NamespacedName {
-	name := in.Spec.SourceRef.Name
-	namespace := in.Spec.SourceRef.Namespace
-	if namespace == "" {
-		namespace = in.Namespace
+func (in *ConfigMapGenerator) GetSourceRefKey() client.ObjectKey {
+	ref := in.GetSourceRef()
+	return client.ObjectKey{Namespace: ref.Namespace, Name: ref.Name}
+}
+
+func (in *ConfigMapGenerator) GetSourceRef() v1beta2.CrossNamespaceSourceReference {
+	ref := in.Spec.SourceRef
+	if ref.Namespace == "" {
+		ref.Namespace = in.Namespace
 	}
-	return types.NamespacedName{Namespace: namespace, Name: name}
+	return ref
 }

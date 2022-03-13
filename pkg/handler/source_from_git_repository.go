@@ -43,7 +43,7 @@ func (s *SourceFromGitRepository) Reconcile(ctx context.Context, obj client.Obje
 func (s *SourceFromGitRepository) reconcile(ctx context.Context, resource *v1beta1.ConfigMapGenerator) (ctrl.Result, error) {
 	log := logr.FromContextOrDiscard(ctx)
 
-	repo, err := s.reader.FetchGitRepository(ctx, resource.GetSourceRefNamespacedName())
+	repo, err := s.reader.FetchGitRepository(ctx, resource.GetSourceRefKey())
 	if err != nil {
 		return s.RequeueOnErr(ctx, err)
 	}
